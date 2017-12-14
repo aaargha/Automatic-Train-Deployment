@@ -1,11 +1,10 @@
 {
   "name": "AutomaticTrainDeployment",
-  "version": "0.1.3",
-  "factorio_version": "0.15",
+  "version": "0.1.4",
+  "factorio_version": "0.16",
   "title": "Automatic Train Deployment",
   "author": "aaargha",
   "contact": "Shoot me a message on the forums/reddit",
   "homepage": "https://forums.factorio.com/viewtopic.php?f=93&t=49689",
   "description": "Adds stations that will automatically deploy/remove trains.",
-  "dependencies": ["base >= 0.15.32"]
 }
