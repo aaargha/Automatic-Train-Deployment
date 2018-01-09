@@ -2,6 +2,31 @@ require("defines")
 require("util")
 local helpers = require("helpers")
 
+--local copies of mod settings
+local circuitAuto
+local circuitSpeed
+local quickDelete
+
+--read local copies of mod settings
+local function copy_settings()
+	circuitAuto = settings.global[AutomaticTrainDeployment_defines.names.settings.circuitAuto].value
+	circuitSpeed = settings.global[AutomaticTrainDeployment_defines.names.settings.circuitSpeed].value
+	quickDelete = settings.global[AutomaticTrainDeployment_defines.names.settings.quickDelete].value
+end
+
+script.on_init(copy_settings)
+script.on_load(copy_settings)
+
+--update local copies of mod settings
+script.on_event(defines.events.on_runtime_mod_setting_changed, function (event)
+	if event.setting == AutomaticTrainDeployment_defines.names.settings.circuitAuto then
+		circuitAuto = settings.global[AutomaticTrainDeployment_defines.names.settings.circuitAuto].value
+	elseif event.setting == AutomaticTrainDeployment_defines.names.settings.circuitSpeed then
+		circuitSpeed = settings.global[AutomaticTrainDeployment_defines.names.settings.circuitSpeed].value
+	elseif event.setting == AutomaticTrainDeployment_defines.names.settings.quickDelete then
+		quickDelete = settings.global[AutomaticTrainDeployment_defines.names.settings.quickDelete].value
+	end
+end)
 
 --the trigger to do stuff
 script.on_event(defines.events.on_train_changed_state, function (event)
@@ -14,7 +39,12 @@ script.on_event(defines.events.on_train_changed_state, function (event)
 	end
 
 	--Delete trains that reach a deleteStop
-	if trigger.state == defines.train_state.wait_station and trigger.station and trigger.station.name == AutomaticTrainDeployment_defines.names.entities.deleteStop then
+	if quickDelete and trigger.state == defines.train_state.arrive_station and trigger.path_end_stop and trigger.path_end_stop.name == AutomaticTrainDeployment_defines.names.entities.deleteStop then
+		for _, cart in pairs(trigger.carriages) do
+			cart.destroy()
+		end
+
+	elseif trigger.state == defines.train_state.wait_station and trigger.station and trigger.station.name == AutomaticTrainDeployment_defines.names.entities.deleteStop then
 		for _, cart in pairs(trigger.carriages) do
 			cart.destroy()
 		end
@@ -51,16 +81,21 @@ script.on_event(defines.events.on_train_changed_state, function (event)
 			new.schedule = helpers.randomize_schedule(source)
 		end
 
-		--allows train auto mode and speed (does not work well with auto) to be set by signals
-		local green = trigger_stop.get_circuit_network(defines.wire_type.green)
-		local red = trigger_stop.get_circuit_network(defines.wire_type.red)
+		local auto = circuitAuto == "Auto"
+		local speed = 0
 
-		local auto = ((green and green.get_signal{ type = "virtual", name = "signal-A"}) or 0) + ((red and red.get_signal{ type = "virtual", name = "signal-A"}) or 0)
-		local speed = ((green and green.get_signal{ type = "virtual", name = "signal-S"}) or 0) + ((red and red.get_signal{ type = "virtual", name = "signal-S"}) or 0)
+		--allows train auto mode and speed to be set by signals
+		if circuitAuto == "A > 0" or circuitSpeed then
+			local green = trigger_stop.get_circuit_network(defines.wire_type.green)
+			local red = trigger_stop.get_circuit_network(defines.wire_type.red)
+
+			auto = ((green and green.get_signal{ type = "virtual", name = "signal-A"}) or 0) + ((red and red.get_signal{ type = "virtual", name = "signal-A"}) or 0) > 0
+			speed = ((green and green.get_signal{ type = "virtual", name = "signal-S"}) or 0) + ((red and red.get_signal{ type = "virtual", name = "signal-S"}) or 0)
+		end
 
 		--set the train to automatic
-		new.manual_mode = auto <= 0
-		new.speed = (speed > 0 and speed) or 0
+		new.manual_mode = not auto 
+		new.speed = (circuitSpeed and speed > 0 and speed) or 0
 	end
 end)
 

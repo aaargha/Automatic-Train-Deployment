@@ -23,5 +23,11 @@ AutomaticTrainDeployment_defines.names =
 		copyStop = "AutomaticTrainDeployment-copy-stop",
 		randomStop = "AutomaticTrainDeployment-random-stop"
 	},
+	settings =
+	{
+		circuitAuto = "AutomaticTrainDeployment-cicruit-auto",
+		circuitSpeed = "AutomaticTrainDeploymentcircuit-speed",
+		quickDelete = "AutomaticTrainDeployment-quick-delete"
+	},
 	technology = "AutomaticTrainDeployment-technology"
 }
