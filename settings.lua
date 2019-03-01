@@ -5,7 +5,7 @@ data:extend({
       type = "string-setting",
       name = AutomaticTrainDeployment_defines.names.settings.circuitAuto,
       setting_type = "runtime-global",
-      default_value = "A > 0",
+      default_value = "Auto",
 	  allowed_values = 
 	  {
 		"Auto",
@@ -17,12 +17,12 @@ data:extend({
       type = "bool-setting",
       name = AutomaticTrainDeployment_defines.names.settings.circuitSpeed,
       setting_type = "runtime-global",
-      default_value = false
+      default_value = true
    },
    {
       type = "bool-setting",
       name = AutomaticTrainDeployment_defines.names.settings.quickDelete,
       setting_type = "runtime-global",
-      default_value = false
+      default_value = true
    }
 })

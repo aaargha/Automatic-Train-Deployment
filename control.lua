@@ -89,8 +89,13 @@ script.on_event(defines.events.on_train_changed_state, function (event)
 			local green = trigger_stop.get_circuit_network(defines.wire_type.green)
 			local red = trigger_stop.get_circuit_network(defines.wire_type.red)
 
-			auto = ((green and green.get_signal{ type = "virtual", name = "signal-A"}) or 0) + ((red and red.get_signal{ type = "virtual", name = "signal-A"}) or 0) > 0
-			speed = ((green and green.get_signal{ type = "virtual", name = "signal-S"}) or 0) + ((red and red.get_signal{ type = "virtual", name = "signal-S"}) or 0)
+			if circuitAuto == "A > 0" then
+				auto = (((green and green.get_signal{ type = "virtual", name = "signal-A"}) or 0) + ((red and red.get_signal{ type = "virtual", name = "signal-A"}) or 0) > 0)
+			end
+
+			if circuitSpeed then
+				speed = (((green and green.get_signal{ type = "virtual", name = "signal-S"}) or 0) + ((red and red.get_signal{ type = "virtual", name = "signal-S"}) or 0))
+			end
 		end
 
 		--set the train to automatic
